@@ -1,1 +1,353 @@
-index.html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>千年修仙 · 伴生神器</title>
+<style>
+:root{
+  --bg:#0e1116; --panel:#161c24; --line:#26303d; --text:#d7e0ea;
+  --muted:#8796a8; --gold:#d4a85a; --green:#67c48b; --red:#e06c6c; --blue:#6aa9e0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;
+  font-size:15px;line-height:1.55;overflow-x:hidden}
+#app{max-width:640px;margin:0 auto;padding:10px 10px 90px;min-height:100vh}
+h1{font-size:20px;margin:6px 0 2px;letter-spacing:2px;color:var(--gold);text-align:center}
+.sub{text-align:center;color:var(--muted);font-size:12px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:14px}
+.row .k{color:var(--muted);flex:0 0 auto}
+.row .v{text-align:right;word-break:break-all}
+.gold{color:var(--gold)} .green{color:var(--green)} .red{color:var(--red)} .blue{color:var(--blue)}
+.bar{height:8px;background:#0a0d11;border-radius:6px;overflow:hidden;margin:6px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#6aa9e0,#67c48b);width:0%}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:42px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+  background:#1d2630;color:var(--text);font-size:14px;cursor:pointer;width:100%;margin:4px 0;
+  transition:.15s;user-select:none}
+.btn:active{transform:scale(.98);background:#24303d}
+.btn.gold{border-color:#5c4a28;background:#2a2318;color:var(--gold)}
+.btn.green{border-color:#2d4a38;background:#17261e;color:var(--green)}
+.btn.red{border-color:#5a2c2c;background:#2a1717;color:var(--red)}
+.btn.blue{border-color:#2c455a;background:#17222a;color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.log{background:#0a0d11;border:1px solid var(--line);border-radius:10px;padding:10px;
+  height:150px;overflow-y:auto;font-size:13px;color:#b9c7d6;white-space:pre-wrap;word-break:break-word}
+.log p{margin:0 0 4px}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:20px;
+  border:1px solid var(--line);color:var(--muted);margin-left:4px}
+.hidden{display:none!important}
+.center{text-align:center}
+#bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(14,17,22,.96);
+  border-top:1px solid var(--line);padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  max-width:640px;margin:0 auto;display:flex;gap:6px;z-index:50}
+#bottom .btn{margin:0;flex:1;font-size:13px;min-height:38px;padding:6px 4px}
+.small{font-size:12px;color:var(--muted)}
+.sep{height:1px;background:var(--line);margin:8px 0}
+select,input{background:#0a0d11;color:var(--text);border:1px solid var(--line);
+  border-radius:8px;padding:8px;font-size:14px;width:100%}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="startScreen">
+    <h1>千 年 修 仙</h1>
+    <div class="sub">现实一日 · 洞中千年</div>
+    <div class="card">
+      <div class="center" style="margin-bottom:8px">选择你的伴生神器</div>
+      <div class="grid2">
+        <div class="card" style="margin:0;cursor:pointer" onclick="chooseArtifact('lian')">
+          <div class="center gold" style="font-size:22px">🪷</div>
+          <div class="center" style="font-weight:600;margin:4px 0">混沌青莲</div>
+          <div class="small center">每千年额外获得<br>300 年修炼进度</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer" onclick="chooseArtifact('ding')">
+          <div class="center gold" style="font-size:22px">🍶</div>
+          <div class="center" style="font-weight:600;margin:4px 0">三足玄鼎</div>
+          <div class="small center">每千年随机获得<br>1 颗永久属性丹</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;grid-column:1/-1" onclick="chooseArtifact('ruyi')">
+          <div class="center gold" style="font-size:22px">🪭</div>
+          <div class="center" style="font-weight:600;margin:4px 0">天界如意</div>
+          <div class="small center">每千年获得 1 次进入天界碎片世界的机会，可积累，探索获得炼丹炼器材料</div>
+        </div>
+      </div>
+    </div>
+    <div class="small center">数据保存在浏览器本地 · 建议开局后导出一次存档</div>
+  </div>
+  <div id="gameScreen" class="hidden">
+    <div class="card">
+      <div class="row"><span class="k">境界</span><span class="v gold" id="uiRealm">炼气一层</span></div>
+      <div class="row"><span class="k">修为</span><span class="v" id="uiCult">0 / 100</span></div>
+      <div class="bar"><i id="uiCultBar"></i></div>
+      <div class="row"><span class="k">寿元</span><span class="v" id="uiLife">100</span></div>
+      <div class="row"><span class="k">灵石</span><span class="v gold" id="uiStone">0</span></div>
+      <div class="sep"></div>
+      <div class="row"><span class="k">攻击</span><span class="v red" id="uiAtk">10</span></div>
+      <div class="row"><span class="k">防御</span><span class="v blue" id="uiDef">5</span></div>
+      <div class="row"><span class="k">气血</span><span class="v green" id="uiHp">100</span></div>
+      <div class="row"><span class="k">神器</span><span class="v gold" id="uiArtifact">—</span></div>
+      <div class="row"><span class="k">距下次千年</span><span class="v" id="uiMill">—</span></div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="k">游戏总年份</span><span class="v" id="uiYear">0</span></div>
+      <div class="row"><span class="k">现实折算</span><span class="v small" id="uiReal">1 分钟 ≈ 0.69 年</span></div>
+    </div>
+    <div class="card" id="artifactPanel"></div>
+    <div class="card">
+      <div class="grid2">
+        <button class="btn green" onclick="actCultivate()">修炼 <span class="tag">10年</span></button>
+        <button class="btn blue" onclick="actExplore()">探索 <span class="tag">1年</span></button>
+        <button class="btn red" onclick="openBattle()">战斗挑战 <span class="tag">同阶</span></button>
+        <button class="btn gold" onclick="actBreakthrough()">尝试突破</button>
+      </div>
+      <div class="small center" style="margin-top:4px">修炼 / 探索 会推进游戏时间，可能触发千年结算</div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="k">丹药</span><span class="v" id="uiPills">—</span></div>
+      <div class="grid2" style="margin-top:6px">
+        <button class="btn" onclick="usePill('atk')">服用攻丹</button>
+        <button class="btn" onclick="usePill('def')">服用防丹</button>
+        <button class="btn" onclick="usePill('hp')">服用血丹</button>
+        <button class="btn" onclick="openRuyi()">天界碎片</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="small" style="margin-bottom:6px">日志</div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+</div>
+<div id="bottom" class="hidden">
+  <button class="btn" onclick="saveGame(true)">存档</button>
+  <button class="btn" onclick="exportSave()">导出</button>
+  <button class="btn" onclick="document.getElementById('importFile').click()">导入</button>
+  <button class="btn" onclick="hardReset()">重开</button>
+</div>
+<input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importSave(event)">
+<script>
+const SAVE_KEY = 'qiannian_xiuxian_save_v1';
+const REALMS = [
+  {name:'炼气',    need:100,       life:100,    atk:10,  def:5,   hp:100},
+  {name:'筑基',    need:600,       life:200,    atk:22,  def:12,  hp:260},
+  {name:'金丹',    need:3000,      life:500,    atk:55,  def:30,  hp:700},
+  {name:'元婴',    need:15000,     life:1200,   atk:140, def:75,  hp:1900},
+  {name:'出窍',    need:80000,     life:3000,   atk:360, def:190, hp:5200},
+  {name:'分神',    need:420000,    life:7000,   atk:900, def:480, hp:14000},
+  {name:'合体',    need:2200000,   life:15000,  atk:2300,def:1200,hp:38000},
+  {name:'洞虚',    need:12000000,  life:30000,  atk:5800,def:3100,hp:98000},
+  {name:'大乘',    need:65000000,  life:60000,  atk:15000,def:8000,hp:250000},
+  {name:'洞真',    need:3.5e8,     life:120000, atk:38000,def:20000,hp:640000},
+  {name:'散仙',    need:2e9,       life:250000, atk:96000,def:51000,hp:1600000},
+  {name:'游仙',    need:1.2e10,    life:500000, atk:240000,def:130000,hp:4000000},
+  {name:'地仙',    need:7e10,      life:1000000,atk:600000,def:330000,hp:1e7},
+  {name:'天仙',    need:4e11,      life:2000000,atk:1500000,def:820000,hp:2.5e7},
+  {name:'金仙',    need:2.4e12,    life:5000000,atk:3800000,def:2100000,hp:6.4e7},
+  {name:'大罗金仙',need:1.5e13,    life:1e7,    atk:1e7,  def:5.5e6, hp:1.6e8}
+];
+const SUB = ['一层','二层','三层','四层','五层','六层','七层','八层','九层','圆满'];
+const PILL_CAP = 135;
+const PILL_VALUE = { atk: 50, def: 50, hp: 350 };
+function fmt(n){
+  if(n===undefined||n===null) return '0';
+  n = Math.floor(n);
+  if(n < 10000) return n.toLocaleString('en-US');
+  if(n < 1e8) return (n/1e4).toFixed(2).replace(/\.?0+$/,'') + '万';
+  if(n < 1e12) return (n/1e8).toFixed(2).replace(/\.?0+$/,'') + '亿';
+  return (n/1e12).toFixed(2).replace(/\.?0+$/,'') + '万亿';
+}
+function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function freshState(){
+  return {
+    artifact: null, realmIndex: 0, subIndex: 0, cultivation: 0,
+    life: REALMS[0].life, stone: 0, pillCount: { atk:0, def:0, hp:0 },
+    pillAtk: 0, pillDef: 0, pillHp: 0, ruyiTokens: 0, millYearAcc: 0,
+    totalYear: 0, lastRealTs: Date.now(), logs: [], seenIntro: false
+  };
+}
+let S = null;
+function saveGame(manual){
+  if(!S) return;
+  S.lastRealTs = Date.now();
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify(S));
+    if(manual) addLog('💾 已存档。');
+  }catch(e){ addLog('⚠️ 存档失败：浏览器存储不可用或已满。'); }
+}
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(!obj || typeof obj !== 'object') return null;
+    return Object.assign(freshState(), obj);
+  }catch(e){ return null; }
+}
+function exportSave(){
+  if(!S) return; saveGame();
+  const blob = new Blob([JSON.stringify(S,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '千年修仙存档_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+  addLog('📤 存档已导出，请保存好 JSON 文件。');
+}
+function importSave(ev){
+  const f = ev.target.files && ev.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const obj = JSON.parse(reader.result);
+      if(!obj || typeof obj !== 'object' || !obj.artifact) throw new Error('bad');
+      S = Object.assign(freshState(), obj);
+      S.lastRealTs = Date.now(); saveGame(); renderAll(); addLog('📥 存档已导入。');
+    }catch(e){ alert('导入失败：文件不是有效的存档。'); }
+  };
+  reader.readAsText(f); ev.target.value = '';
+}
+function hardReset(){
+  if(!confirm('确定重开？当前进度会被清空，建议先导出存档。')) return;
+  localStorage.removeItem(SAVE_KEY); location.reload();
+}
+function addLog(msg){
+  if(!S) return;
+  const time = '[' + (S.totalYear ? fmt(S.totalYear)+'年' : '开局') + '] ';
+  S.logs.push(time + msg);
+  if(S.logs.length > 120) S.logs.shift();
+  renderLog();
+}
+function renderLog(){
+  const el = document.getElementById('log');
+  if(!el) return;
+  el.innerHTML = S.logs.slice(-80).map(l=>'<p>'+escapeHtml(l)+'</p>').join('');
+  el.scrollTop = el.scrollHeight;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+function chooseArtifact(key){
+  S = freshState(); S.artifact = key; S.seenIntro = true;
+  if(key === 'lian')  addLog('🪷 你获得了伴生神器【混沌青莲】。千年一转，莲开修为。');
+  if(key === 'ding')  addLog('🍶 你获得了伴生神器【三足玄鼎】。千年一炉，丹随机出。');
+  if(key === 'ruyi')  addLog('🪭 你获得了伴生神器【天界如意】。千年一隙，可入天界碎片。');
+  addLog('你从炼气一层开始。现实一日，洞中千年。');
+  saveGame(); renderAll();
+}
+function realmName(){ return REALMS[S.realmIndex].name + SUB[clamp(S.subIndex,0,9)]; }
+function realmNeed(){ return Math.floor(REALMS[S.realmIndex].need * (1 + S.subIndex * 0.18)); }
+function isMaxRealm(){ return S.realmIndex >= REALMS.length - 1 && S.subIndex >= SUB.length - 1; }
+function playerAtk(){ return REALMS[S.realmIndex].atk + S.pillAtk; }
+function playerDef(){ return REALMS[S.realmIndex].def + S.pillDef; }
+function playerHp(){ return REALMS[S.realmIndex].hp + S.pillHp; }
+function playerLife(){ return REALMS[S.realmIndex].life; }
+function processMillis(){
+  while(S.millYearAcc >= 1000){ S.millYearAcc -= 1000; settleOneMillennium(); }
+}
+function settleOneMillennium(){
+  if(S.artifact === 'lian'){ S.cultivation += 300; addLog('🪷 混沌青莲绽放：额外获得 300 年修炼进度。'); }
+  if(S.artifact === 'ding'){
+    const roll = Math.random(); let type = 'atk';
+    if(roll < 0.34) type = 'atk'; else if(roll < 0.67) type = 'def'; else type = 'hp';
+    if(S.pillCount[type] >= PILL_CAP){
+      addLog('🍶 三足玄鼎成丹，但此类丹药已服满上限，丹力化入气血。'); S.stone += 200 * (S.realmIndex+1);
+    } else {
+      S.pillCount[type]++;
+      addLog('🍶 三足玄鼎炼出 1 颗【' + (type==='atk'?'攻击丹':type==='def'?'防御丹':'气血丹') + '】（已存 ' + S.pillCount[type] + '/' + PILL_CAP + '）。');
+    }
+  }
+  if(S.artifact === 'ruyi'){ S.ruyiTokens++; addLog('🪭 天界如意凝出 1 枚【天界碎片令】（当前 ' + S.ruyiTokens + ' 枚）。'); }
+  S.cultivation += Math.floor(REALMS[S.realmIndex].need * 0.15);
+}
+function advanceYears(years){
+  if(years <= 0) return;
+  const before = S.totalYear; S.totalYear += years; S.millYearAcc += years;
+  processMillis();
+  if(S.totalYear > playerLife() && before <= playerLife()){ addLog('⚠️ 寿元已尽。第一版暂不触发死亡，但后续版本需要渡劫延寿。'); }
+  if(years >= 10){ const gain = Math.floor(years * REALMS[S.realmIndex].need * 0.002); if(gain > 0) S.cultivation += gain; }
+}
+function actCultivate(){
+  advanceYears(10);
+  const gain = Math.floor(REALMS[S.realmIndex].need * 0.08) + randInt(1, Math.max(2, Math.floor(REALMS[S.realmIndex].need*0.02)));
+  S.cultivation += gain; addLog('🧘 修炼 10 年，修为 +' + fmt(gain) + '。'); afterAction();
+}
+function actExplore(){
+  advanceYears(1); const roll = Math.random();
+  if(roll < 0.42){ const stone = randInt(5, 15) * (S.realmIndex + 1); S.stone += stone; addLog('🗺️ 探索 1 年，发现一处小矿脉，灵石 +' + fmt(stone) + '。'); }
+  else if(roll < 0.62){ const gain = Math.floor(REALMS[S.realmIndex].need * 0.03) + randInt(1,5); S.cultivation += gain; addLog('🍃 探索 1 年，偶得灵草，修为 +' + fmt(gain) + '。'); }
+  else if(roll < 0.78){ addLog('🌫️ 探索 1 年，山中雾气茫茫，未有所获。'); }
+  else { const stone = randInt(20, 40) * (S.realmIndex + 1); S.stone += stone; addLog('💎 探索 1 年，拾到一块灵石，灵石 +' + fmt(stone) + '。'); }
+  afterAction();
+}
+function actBreakthrough(){
+  if(isMaxRealm()){ addLog('你已经站在此界巅峰。'); renderAll(); return; }
+  const need = realmNeed();
+  if(S.cultivation < need){ addLog('修为不足，还需 ' + fmt(need - S.cultivation) + ' 修为才能尝试突破。'); renderAll(); return; }
+  const isBig = (S.subIndex === SUB.length - 1);
+  let rate = isBig ? clamp(0.55 - S.realmIndex * 0.015, 0.30, 0.55) : 0.85;
+  if(Math.random() < rate){
+    S.cultivation -= need;
+    if(S.subIndex < SUB.length - 1){ S.subIndex++; addLog('✨ 突破成功，晋入 ' + realmName() + '。'); }
+    else { S.realmIndex++; S.subIndex = 0; S.cultivation = 0; S.life = playerLife(); addLog('⚡ 大境界突破成功！你已踏入【' + REALMS[S.realmIndex].name + '】。'); }
+  } else {
+    const loss = Math.floor(need * 0.35); S.cultivation = Math.max(0, S.cultivation - loss); addLog('💥 突破失败，修为 -' + fmt(loss) + '。稳住道心，再来。');
+  }
+  afterAction();
+}
+let battleEnemy = null;
+function openBattle(){
+  const idx = S.realmIndex; const r = REALMS[idx];
+  battleEnemy = { name: r.name + '·散修', atk: Math.floor(r.atk * (0.85 + Math.random()*0.25)), def: Math.floor(r.def * (0.85 + Math.random()*0.25)), hp: Math.floor(r.hp * (0.85 + Math.random()*0.25)), maxHp: 0, stoneReward: Math.floor(20 * (idx+1) * (0.8+Math.random()*0.6)) };
+  battleEnemy.maxHp = battleEnemy.hp;
+  addLog('⚔️ 遭遇 ' + battleEnemy.name + '：攻 ' + fmt(battleEnemy.atk) + ' / 防 ' + fmt(battleEnemy.def) + ' / 血 ' + fmt(battleEnemy.hp) + '。');
+  renderAll(); setTimeout(()=>resolveBattle(), 120);
+}
+function resolveBattle(){
+  if(!battleEnemy) return;
+  const pAtk = playerAtk(), pDef = playerDef(), pHpMax = playerHp();
+  let eHp = battleEnemy.hp, pHp = pHpMax, round = 0;
+  while(round < 50 && eHp > 0 && pHp > 0){
+    round++; eHp -= Math.max(1, pAtk - battleEnemy.def);
+    if(eHp <= 0) break;
+    pHp -= Math.max(1, battleEnemy.atk - pDef);
+  }
+  if(eHp <= 0 && pHp > 0){
+    S.stone += battleEnemy.stoneReward; let extra = '';
+    if(Math.random() < 0.18){
+      const types = ['atk','def','hp']; const t = types[randInt(0,2)];
+      if(S.pillCount[t] < PILL_CAP){ S.pillCount[t]++; extra = '，并拾得 1 颗' + (t==='atk'?'攻击丹':t==='def'?'防御丹':'气血丹'); }
+    }
+    addLog('🏆 战斗胜利（' + round + '回合）：灵石 +' + fmt(battleEnemy.stoneReward) + extra + '。');
+  } else { addLog('🩸 战斗未胜（' + round + '回合）。你退回洞府，未损失修为。'); }
+  battleEnemy = null; afterAction();
+}
+function usePill(type){
+  if(S.pillCount[type] <= 0){ addLog('没有可用的' + (type==='atk'?'攻击丹':type==='def'?'防御丹':'气血丹') + '。'); renderAll(); return; }
+  if(S.pillCount[type] > PILL_CAP) S.pillCount[type] = PILL_CAP;
+  S.pillCount[type]--;
+  if(type === 'atk') S.pillAtk += PILL_VALUE.atk;
+  if(type === 'def') S.pillDef += PILL_VALUE.def;
+  if(type === 'hp')  S.pillHp  += PILL_VALUE.hp;
+  addLog('💊 服用' + (type==='atk'?'攻击':type==='def'?'防御':'气血') + '丹：属性 +' + (type==='hp'?PILL_VALUE.hp:(type==='atk'?PILL_VALUE.atk:PILL_VALUE.def)) + '。');
+  afterAction();
+}
+function openRuyi(){
+  if(S.artifact !== 'ruyi'){ addLog('你没有天界如意。'); renderAll(); return; }
+  if(S.ruyiTokens <= 0){ addLog('暂无天界碎片令，等待下一个千年。'); renderAll(); return; }
+  S.ruyiTokens--; const base = REALMS[S.realmIndex].need; const roll = Math.random();
+  if(roll < 0.45){ const stone = Math.floor(base * 0.02) + randInt(10,50); S.stone += stone; addLog('🪭 进入天界碎片世界，拾得灵石 +' + fmt(stone) + '。'); }
+  else if(roll < 0.78){ const gain = Math.floor(base * 0.05); S.cultivation += gain; addLog('🪭 天界碎片中灵机浓郁，修为 +' + fmt(gain) + '。'); }
+  else { const stone = Math.floor(base * 0.03); const gain = Math.floor(base * 0.03); S.stone += stone; S.cultivation += gain; addLog('🪭 天界碎片中发现炼丹材料：灵石 +' + fmt(stone) + '，修为 +' + fmt(gain) + '。'); }
+  afterAction();
+}
+function afterAction(){ processMillis(); saveGame(); renderAll(); }
+function renderAll(){
+  if(!S) return;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  document.getElementById('bottom').classList.remove('hidden');
+  document.getElementById('uiRealm').textContent = realmName();
+  const need = realmNe
